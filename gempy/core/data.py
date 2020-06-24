@@ -184,7 +184,7 @@ class Grid(object):
         else:
             raise AttributeError('source must be random, gdal or saved')
 
-        self.topography.show()
+        #self.topography.show()
         self.set_active('topography')
 
     @setdoc(grid_types.Sections.__doc__)
