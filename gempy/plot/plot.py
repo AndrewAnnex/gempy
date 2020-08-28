@@ -27,7 +27,7 @@
 # sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
 from typing import Set, Tuple, Dict, Union
-from nptyping import Array
+from nptyping import NDArray as Array
 import gempy as _gempy
 from .visualization_2d import PlotData2D, PlotSolution
 from .visualization_3d import GemPyvtkInteract

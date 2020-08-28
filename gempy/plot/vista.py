@@ -53,7 +53,7 @@ try:
 except ImportError:
     VTK_IMPORT = False
 
-from nptyping import Array
+from nptyping import NDArray as Array
 from logging import debug
 
 

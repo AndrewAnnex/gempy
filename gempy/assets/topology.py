@@ -18,7 +18,7 @@
 @author: Alexander Schaaf
 """
 import numpy as np
-from nptyping import Array
+from nptyping import NDArray as Array
 from typing import List, Set, Tuple, Dict, Union, Optional
 import matplotlib.pyplot as plt
 

@@ -1,6 +1,6 @@
 import scipy.stats as ss
 import numpy as np
-from nptyping import Array
+from nptyping import NDArray as Array
 from copy import deepcopy
 import pandas as pd
 from abc import ABC, abstractmethod

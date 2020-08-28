@@ -17,7 +17,7 @@ GemPy is licensed under the GNU Lesser General Public License v3.0
 from itertools import combinations
 from logging import debug
 import numpy as np
-from nptyping import Array
+from nptyping import NDArray as Array
 from typing import Iterable, List
 
 
