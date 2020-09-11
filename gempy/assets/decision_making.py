@@ -549,7 +549,6 @@ def plot_multiple_loss():
             x, n, l, partial = compute_values(mu[e], sigma[e], type[e],
                                                       x_range=(-24 + 6, 6 + 24),
                                                       risk=.2, depth=ss)
-            #print(_1.mean(),  d_cost.mean())
             axr_.plot(x, l, linewidth=3, color='white')
             axr_.plot(x, l, linewidth=2, label='Risk Friendly')
             axr_.plot(x[l.argmin()], 0, 'o',  color='b', markersize=12)

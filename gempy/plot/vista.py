@@ -25,6 +25,9 @@
 """
 from __future__ import annotations
 
+import logging
+logger = logging.getLogger('gempy')
+
 import warnings
 from typing import Union, Dict, List, Iterable, Set, Tuple
 
@@ -485,11 +488,11 @@ class GemPyToVista(WidgetsCallbacks, RenderChanges):
             except IndexError:
                 t = time.localtime()
                 current_time = time.strftime("[%H:%M:%S]", t)
-                print(current_time + 'IndexError: Model not computed. Laking data in some surface')
+                logger.error(current_time + 'IndexError: Model not computed. Laking data in some surface')
             except AssertionError:
                 t = time.localtime()
                 current_time = time.strftime("[%H:%M:%S]", t)
-                print(current_time + 'AssertionError: Model not computed. Laking data in some surface')
+                logger.error(current_time + 'AssertionError: Model not computed. Laking data in some surface')
 
         self.remove_actor(self.regular_grid_actor)
         surfaces = self.model._surfaces

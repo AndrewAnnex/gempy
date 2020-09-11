@@ -24,7 +24,8 @@ Created on 1/5/2017
 
 @author: Miguel de la Varga
 """
-
+import logging
+logger = logging.getLogger('gempy')
 import theano
 import theano.tensor as T
 import matplotlib.pyplot as plt
@@ -84,7 +85,7 @@ def transform_data(df_o, n_comp=1, log10=False):
 
     # Take log to try to aproximate better the normal distributions
     if log10:
-        print('computing log')
+        logger.info('computing log')
         df[df.columns.difference(['X', 'Y', 'Z'])] = np.log10(df[df.columns.difference(['X', 'Y', 'Z'])])
 
     # Finding n modes in the data
@@ -608,11 +609,9 @@ class SGS(object):
             # Init tensor
             b = np.zeros((len(lags), n_iter, 0))
             for i_exp in range(0, n_exp):
-                # print(i_exp, "exp")
                 b = np.dstack((b, trace['weights'][:, i_exp + i * (n_exp + n_gauss)] *
                                exp_vario(lags, trace['sill'][:, i_exp], trace['range'][:, i_exp])))
             for i_gaus in range(n_exp, n_gauss + n_exp):
-                # print(i_gaus)
                 b = np.dstack((b, trace['weights'][:, i_gaus + i * (n_exp + n_gauss)] *
                                gaus_vario(lags, trace['sill'][:, i_gaus], trace['range'][:, i_gaus])))
             # Sum the contributins of each function
@@ -729,7 +728,6 @@ def fit_cross_cov(df, lags, n_exp=2, n_gaus=2, range_mu=None):
 
     # Because is a experimental variogram I am not going to have outliers
     nugget_max = df.values.max()
-    # print(n_basis_f, n_var*n_exp, nugget_max, range_mu, prior_std_reg)
     # pymc3 Model
     with pm.Model() as model:  # model specifications in PyMC3 are wrapped in a with-statement
         # Define priors
@@ -781,11 +779,9 @@ def plot_cross_variograms(trace, lags, df, n_exp=2, n_gaus=2, iter_plot=200, exp
         # Init tensor
         b = np.zeros((len(lags), n_iter, 0))
         for i_exp in range(0, n_exp):
-            # print(i_exp, "exp")
             b = np.dstack((b, trace['weights'][:, i_exp + i * (n_exp + n_gaus)] *
                            exp_vario(lags, trace['sill'][:, i_exp], trace['range'][:, i_exp])))
         for i_gaus in range(n_exp, n_gaus + n_exp):
-            # print(i_gaus)
             b = np.dstack((b, trace['weights'][:, i_gaus + i * (n_exp + n_gaus)] *
                            gaus_vario(lags, trace['sill'][:, i_gaus], trace['range'][:, i_gaus])))
         # Sum the contributins of each function
@@ -819,11 +815,9 @@ def plot_cross_covariance(trace, lags, df, n_exp=2, n_gaus=2, nuggets=None, iter
         # Init tensor
         b = np.zeros((len(lags), n_iter, 0))
         for i_exp in range(0, n_exp):
-            # print(i_exp, "exp")
             b = np.dstack((b, trace['weights'][:, i_exp + i * (n_exp + n_gaus)] *
                            exp_vario(lags, trace['sill'][:, i_exp], trace['range'][:, i_exp])))
         for i_gaus in range(n_exp, n_gaus + n_exp):
-            # print(i_gaus)
             b = np.dstack((b, trace['weights'][:, i_gaus + i * (n_exp + n_gaus)] *
                            gaus_vario(lags, trace['sill'][:, i_gaus], trace['range'][:, i_gaus])))
         # Sum the contributins of each function
@@ -1021,8 +1015,6 @@ def SGS_run(df, grid_to_inter, cluster,
             # Euclidiand distances
             h_x0 = SED_f(coord_data, selected_cluster_grid)
             # Drop any point already simulated
-            #print((h_x0==0).sum())
-          #  h_x0 = h_x0[~np.any(h_x0 == 0, axis=1)]
             h_xi = SED_f(coord_data, coord_data)
 
             # Checking the radius of the simulation

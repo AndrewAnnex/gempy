@@ -5,18 +5,9 @@ with Uncertainty_Obj module)
 
 (c) J. Florian Wellmann, 2009-2013
 """
+import logging
+logger = logging.getLogger('gempy')
 
-# try:
-#     import elementtree.ElementTree as ET
-# except ImportError:
-#     try:
-#         import etree.ElementTree as ET
-#     except ImportError:
-#         try:
-#             import xml.etree.ElementTree as ET
-#         except ImportError:
-#             import ElementTree as ET
-# import Latex_output_5 as LO
 from pylab import *
 import copy
 import pandas as pn
@@ -310,7 +301,7 @@ class ReadGeoModellerXML:
             pandas.DataFrame: InputData.surface_points dataframe
         """
         if self.root.find("{" + self.xmlns + "}Structural3DData") is None:
-            print("No 3D data stored in given xml file.")
+            logger.error("No 3D data stored in given xml file.")
             return None
         else:
             fmts = [c.attrib["Name"] for c in self.root.find("{" + self.xmlns + "}Structural3DData")[0]]  # use formations
@@ -343,7 +334,7 @@ class ReadGeoModellerXML:
             pandas.DataFrame: InputData.orientations dataframe
         """
         if self.root.find("{" + self.xmlns + "}Structural3DData") is None:
-            print("No 3D data stored in given xml file.")
+            logger.error("No 3D data stored in given xml file.")
             return None
         else:
             fol = []
@@ -381,7 +372,6 @@ class ReadGeoModellerXML:
                     fmts.append(c.attrib["Name"])
                 elif "InfluencedByFault" in c.tag:
                     influenced_by.append(c.attrib["Name"])
-            # print(fmts)
             sp[s] = {}
             sp[s]["formations"] = fmts
             sp[s]["InfluencedByFault"] = influenced_by
@@ -453,8 +443,8 @@ class GeomodellerClass:
         try:
             tree = ET.parse(xml_file)
         except IOError:
-            print(("Can not open xml File " + xml_file + ": " + string_err))
-            print ("Please check file name and directory and try again")
+            logger.error(("Can not open xml File " + xml_file + ": " + string_err))
+            logger.info("Please check file name and directory and try again")
             raise IOError
         # safe tree on local varibale
         self.tree = tree
@@ -488,7 +478,7 @@ class GeomodellerClass:
             self.tree = deepcopy_tree
             self.rootelement = self.tree.getroot()
         except NameError:
-            print ("No deep copy of original tree available, please create with self.deepcopy_tree()")
+            logger.info("No deep copy of original tree available, please create with self.deepcopy_tree()")
 
     def get_model_extent(self):
         """get extent of model
@@ -530,7 +520,7 @@ class GeomodellerClass:
             faults_parent = self.rootelement.findall("{"+self.xmlns+"}Faults")[0]
             self.faults = faults_parent.findall("{"+self.xmlns+"}Fault")
         except IndexError:
-            print("No df found in model")
+            logger.error("No df found in model")
         return self.faults
 
     def get_formations(self):
@@ -568,7 +558,6 @@ class GeomodellerClass:
         try:
             self.sections
         except AttributeError:
-            # print "Create sections Data array"
             self.get_sections()
         section_names = []
         for section in self.sections:
@@ -603,50 +592,48 @@ class GeomodellerClass:
         for sec in list(self.section_dict.keys()):
             forms = self.get_formation_point_data(self.section_dict[sec])
             if forms == None:
-                print ("\t\t\tNo Formation Points in this section")
+                logger.info("\t\t\tNo Formation Points in this section")
             else:
                 for form in forms:
-                    #print form.get("ObservationID")
-                #    if form.get("ObservationID") == None: continue
                     data = form.find("{"+self.xmlns+"}Data")
-                    print(("\nObsID = %s" % form.get("ObservationID")))
-                    print(("\tFormation name\t= %s" % data.get("Name")))
+                    logger.info(("\nObsID = %s" % form.get("ObservationID")))
+                    logger.info(("\tFormation name\t= %s" % data.get("Name")))
                     element_point = form.find("{"+self.gml+"}LineString")
                     element_coords = element_point.find("{"+self.gml+"}coordinates")
                     tmp = element_coords.text.split(" ")
                     for tmp1 in tmp:
                         if tmp1 == '': continue
                         tmp_cds = tmp1.split(",")
-                        print(("\tX = %.1f, Y = %.1f" % (float(tmp_cds[0]), float(tmp_cds[1]))))
+                        logger.info(("\tX = %.1f, Y = %.1f" % (float(tmp_cds[0]), float(tmp_cds[1]))))
 
 
                     fol = form.find("{"+self.xmlns+"}FoliationObservation")
                     if fol is not None:
-                        print(("\tFoliation defined: azimuth = %.1f, dip = %.1f" % (float(fol.get("Azimuth")), float(fol.get("Dip")))))
+                        logger.info(("\tFoliation defined: azimuth = %.1f, dip = %.1f" % (float(fol.get("Azimuth")), float(fol.get("Dip")))))
                         # get position of foliation (yet another point)
                         pt = fol.find("{"+self.gml+"}Point")
                         c = pt.find("{"+self.gml+"}coordinates")
                         cds = c.text.split(",")
-                        print(("\t\tX = %.1f, Y = %.1f" % (float(cds[0]), float(cds[1]))))
+                        logger.info(("\t\tX = %.1f, Y = %.1f" % (float(cds[0]), float(cds[1]))))
 
-            print ("\n")
-            print((80*"-"))
-            print(("Foliations in section %s:" % sec))
-            print((80*"-"))
+            logger.info("\n")
+            logger.info((80*"-"))
+            logger.info(("Foliations in section %s:" % sec))
+            logger.info((80*"-"))
             foliations = self.get_foliations(self.section_dict[sec])
             if foliations == None:
-                print ("\t\t\tNo foliations in this section")
+                logger.info("\t\t\tNo foliations in this section")
             else:
                 for fol1 in foliations:
-                    print(("\nObsID = %s" % fol1.get("ObservationID")))
+                    logger.info(("\nObsID = %s" % fol1.get("ObservationID")))
                     data = fol1.find("{"+self.xmlns+"}Data")
                     fol = fol1.find("{"+self.xmlns+"}FoliationObservation")
-                    print(( "\tFormation name\t= %s" % data.get("Name")))
-                    print(("\tAzimuth = %.1f, dip = %.1f" % (float(fol.get("Azimuth")), float(fol.get("Dip")))))
+                    logger.info(( "\tFormation name\t= %s" % data.get("Name")))
+                    logger.info(("\tAzimuth = %.1f, dip = %.1f" % (float(fol.get("Azimuth")), float(fol.get("Dip")))))
                     pt = fol.find("{"+self.gml+"}Point")
                     c = pt.find("{"+self.gml+"}coordinates")
                     cds = c.text.split(",")
-                    print(("\tX = %.1f, Y = %.1f" % (float(cds[0]), float(cds[1]))))
+                    logger.info(("\tX = %.1f, Y = %.1f" % (float(cds[0]), float(cds[1]))))
         return
 
     def get_formation_parameters(self):
@@ -660,7 +647,6 @@ class GeomodellerClass:
         try:
             self.formations
         except AttributeError:
-            #            print "Create sections Data array"
             self.get_formations()
         for formation in self.formations:
             self.formation_params[formation.get("Name")] = {}
@@ -670,7 +656,6 @@ class GeomodellerClass:
             self.formation_params[formation.get("Name")]["dens_mean"] = dens_simple.get("Mean")
             self.formation_params[formation.get("Name")]["dens_law"] = dens_simple.get("LawType")
             self.formation_params[formation.get("Name")]["dens_dev"] = dens_simple.get("Deviation")
-            #             print geophys.getchildren()
             mag = geophys.find("{"+self.xmlns+"}RemanantMagnetizationCompoundDistribution")
             mag_simple = mag.find("{"+self.xmlns+"}SimpleDistributionVector")
             self.formation_params[formation.get("Name")]["mag"] = mag_simple.get("Mean")
@@ -693,11 +678,6 @@ class GeomodellerClass:
             self.formation_params[formation.get("Name")]["heat_prod_law"] = heat_prod_simple.get("LawType")
             self.formation_params[formation.get("Name")]["heat_prod_dev"] = heat_prod_simple.get("Deviation")
 
-            # same for other properties
-        #    print th_cond
-            #
-            # !!! only simple distributions yet impl.
-            #
 
     def create_fault_dict(self):
         """create dictionary for fault elements with names as keys"""
@@ -705,7 +685,7 @@ class GeomodellerClass:
         try:
             self.faults
         except AttributeError:
-            print ("Create Surfaces list")
+            logger.info("Create Surfaces list")
             self.get_faults()
         self.fault_dict = {}
         for fault in self.faults:
@@ -718,7 +698,7 @@ class GeomodellerClass:
         try:
             self.formations
         except AttributeError:
-            print ("Create formation dictionary")
+            logger.info("Create formation dictionary")
             self.get_formations()
         self.formation_dict = {}
         for formation in self.formations:
@@ -732,7 +712,6 @@ class GeomodellerClass:
         try:
             self.sections
         except AttributeError:
-            # print "Create sections dictionary"
             self.get_sections()
         self.section_dict = {}
         for section in self.sections:
@@ -775,7 +754,7 @@ class GeomodellerClass:
 
     def get_formation_data(self, section_element):
         """not used any more! use get_formation_point_data(section_element) instead"""
-        print ("not used any more! use get_formation_point_data(section_element) instead")
+        logger.info("not used any more! use get_formation_point_data(section_element) instead")
         return None
 
     def get_formation_point_data(self, section_element):
@@ -821,16 +800,16 @@ class GeomodellerClass:
             contact_points_dict = {}
             foliation_dict = {}
             for i in range(len(section_dict)):
-                print(("\n\n\n", list(section_dict.keys())[i], "\n"))
-                print ("Elements and their ID \n")
+                logger.info(("\n\n\n", list(section_dict.keys())[i], "\n"))
+                logger.info("Elements and their ID \n")
                 contact_points = self.get_formation_point_data(list(section_dict.values())[i])
 
                 try:
                     for contact_point in contact_points:
                         contact_points_dict[contact_point.get("ObservationID")] = contact_point
-                        print((contact_point, contact_point.get("ObservationID")))
+                        logger.info((contact_point, contact_point.get("ObservationID")))
                 except TypeError:
-                    print ("No contact points in the section")
+                    logger.error("No contact points in the section")
                 #ObsID = contact_points.get("ObservationID")
                 foliations = self.get_foliations(list(section_dict.values())[i])
                 try:
@@ -839,27 +818,27 @@ class GeomodellerClass:
                         foliation_dict[foliation.get("ObservationID")+"_a"] = foliation
                         # dictionary to access with dip name
                         foliation_dict[foliation.get("ObservationID")+"_d"] = foliation
-                        print((foliation, foliation.get("ObservationID")))
+                        logger.info((foliation, foliation.get("ObservationID")))
 
                 except TypeError:
-                    print ("No foliation in the section")
+                    logger.error("No foliation in the section")
                 try:
                     coord_interface = self.get_point_coordinates(contact_points)
                 except TypeError:
-                    print ("Element does not have iterable objects")
+                    logger.error("Element does not have iterable objects")
 
-                print(("\nDictionaries:\n ", contact_points_dict, "\n", foliation_dict))
+                logger.info(("\nDictionaries:\n ", contact_points_dict, "\n", foliation_dict))
 
-                print(("\n Contact points", contact_points, "\n", coord_interface, "\n"))
+                logger.info(("\n Contact points", contact_points, "\n", coord_interface, "\n"))
 
-                print(("foliations" , foliations,  "\n"))
+                logger.info(("foliations" , foliations,  "\n"))
                 try:
                     for i in range(len(foliations)):
-                        print(("azimut:",self.get_foliation_azimuth(foliations[i])))
-                        print(("dip",self.get_foliation_dip(foliations[i])))
-                        print(("coordinates", self.get_foliation_coordinates(foliations[i])))
+                        logger.info(("azimut:",self.get_foliation_azimuth(foliations[i])))
+                        logger.info(("dip",self.get_foliation_dip(foliations[i])))
+                        logger.info(("coordinates", self.get_foliation_coordinates(foliations[i])))
                 except TypeError:
-                    print ("No foliation in the section")
+                    logger.error("No foliation in the section")
             return None
         #========================
         # change the stuff
@@ -907,18 +886,17 @@ class GeomodellerClass:
                     elif len(point_list) == 2:
                         self.change_formation_point_pos(element, y_coord = [contac_point_mc.value, contac_point_mc.value])
                     else:
-                        print ("The lenght of the points to change does not fit with the number of changes in the input (>2)")
+                        logger.error("The lenght of the points to change does not fit with the number of changes in the input (>2)")
                 except KeyError:
-                    print(("The name of your PyMC variables (%s) does not agree with the ObservationID in the xml. Check misspellings." % str(contac_point_mc)))
+                    logger.error(("The name of your PyMC variables (%s) does not agree with the ObservationID in the xml. Check misspellings." % str(contac_point_mc)))
                     continue
             # Azimuths
         if "azimuths_mc" in args:
             for azimuth_mc in args["azimuths_mc"]:
-                #print azimuth_mc, type(azimuth_mc)
                 try:
                     self.change_foliation(foliation_dict[str(azimuth_mc)], azimuth = str(azimuth_mc.value))
                 except KeyError:
-                    print(("The name of your PyMC variables (%s) does not agree with the ObservationID in the xml. Check misspellings." % str(azimuth_mc)))
+                    logger.error(("The name of your PyMC variables (%s) does not agree with the ObservationID in the xml. Check misspellings." % str(azimuth_mc)))
                     continue
             # Dips
         if "dips_mc" in args:
@@ -926,7 +904,7 @@ class GeomodellerClass:
                 try:
                     self.change_foliation(foliation_dict[str(dip_mc)], dip = str(dip_mc.value))
                 except KeyError:
-                    print(("The name of your PyMC variables (%s) does not agree with the ObservationID in the xml. Check misspellings." % str(dip_mc)))
+                    logger.error(("The name of your PyMC variables (%s) does not agree with the ObservationID in the xml. Check misspellings." % str(dip_mc)))
                     continue
 
 
@@ -938,8 +916,6 @@ class GeomodellerClass:
         add_x_coord, add_y_coord : add values to existing coordinates
         use if_name = and if_provenance = to add conditions!
         print_points = bool: print the list of points that will be modified (default: False)"""
-        #    print "I am here"
-        #print_points = kwds.get('print_points', False)
         prov = element.get("Provenance")
 
         name = element.find("{"+self.xmlns+"}Data").get("Name")
@@ -961,7 +937,7 @@ class GeomodellerClass:
             x_coords = []
             y_coords = []
             if "print_points" in args:
-                print (point_list)
+                logger.info(point_list)
             for point in point_list:
                 # if point == '': continue
                 a = point.split(',')
@@ -978,22 +954,17 @@ class GeomodellerClass:
                 #except TypeError:
                     x_coords = array(args["x_coord"])
                 else:
-                    print ("length of the points you want to change do not match with input dimensions")
+                    logger.error("length of the points you want to change do not match with input dimensions")
             if "y_coord" in args:
-                #print (args["y_coord"])
-                #print array(args["y_coord"])
                 if shape(point_list) == shape(args["y_coord"]):
                     y_coords = array(args["y_coord"])
-                    #            print "ycoords", y_coords
                 else:
-                    print ("length of the points you want to change do not match with input dimensions")
-            #print "Coordenates", x_coords, y_coords
+                    logger.error("length of the points you want to change do not match with input dimensions")
             # Here add coords
             if "add_x_coord" in args:
                 x_coords = x_coords + float(args["add_x_coord"])
             if "add_y_coord" in args:
                 y_coords = y_coords + float(args["add_y_coord"])
-            #    print y_coords
             # now, reconstruct output format strings
             out_text = ''
             for (i, x_coord) in enumerate(x_coords):
@@ -1123,11 +1094,11 @@ class GeomodellerClass:
         # for dip angle: numerical determination of first derivative for
         # twt to depth conversion formula?
         if "change_dip" in args and args["change_dip"]:
-            print ("change dip in seismic profile")
+            logger.info("change dip in seismic profile")
 
         # create check-plot
         if "create_plot" in args and args["create_plot"]:
-            print ("Create plot with twt, converted depth pairs")
+            logger.info("Create plot with twt, converted depth pairs")
             plot(t_list,v_list,'.', label = formula)
             title("TWT to depth: Converted data points\nSection: " + sec_element.get("Name"))
             xlabel("TWT [ms]")
@@ -1164,7 +1135,7 @@ class GeomodellerClass:
         #file = "changed_model.xml"
         tree_new = ET.ElementTree(self.rootelement)
         if "print_path" in args:
-            print(("Write tree to file " + save_dir))
+            logger.info(("Write tree to file " + save_dir))
         tree_new.write(save_dir)
         #self.tree.write("changed_model.xml")
         self.tree.write(save_dir)
@@ -1214,4 +1185,4 @@ class GeomodellerClass:
 
 
 if __name__ == '__main__':
-    print ("main")
+    logger.info("main")

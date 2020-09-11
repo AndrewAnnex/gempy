@@ -2,6 +2,8 @@ import os
 import requests
 import json
 import datetime
+import logging
+logger = logging.getLogger('gempy')
 try:
     import pyqrcode as qr
     PYQRCODE_IMPORT = True
@@ -95,7 +97,7 @@ class RexAPI:
             return owner
 
         else:
-            print("something went wrong! Status code: "+str(self.response.status_code))
+            logger.error("something went wrong! Status code: "+str(self.response.status_code))
 
     def create_project(self, project_name):
         headers = {
@@ -139,7 +141,7 @@ class RexAPI:
             return root_reference_link, root_reference_key
 
         else:
-            print("something went wrong! Status code: " + str(self.response.status_code))
+            logger.error("something went wrong! Status code: " + str(self.response.status_code))
 
     def create_file_resource_reference(self):
         headers = {
@@ -160,7 +162,7 @@ class RexAPI:
             return file_reference_link
 
         else:
-            print("something went wrong! Status code: " + str(self.response.status_code))
+            logger.error("something went wrong! Status code: " + str(self.response.status_code))
 
     def create_project_file(self, projectname):
         headers = {
@@ -186,7 +188,7 @@ class RexAPI:
             return True
 
         else:
-            print("something went wrong! Status code: " + str(self.response.status_code))
+            logger.error("something went wrong! Status code: " + str(self.response.status_code))
 
             return False
 
@@ -244,10 +246,10 @@ class Rextag:
         """
 
         if reverse:
-            print(self.rextag.terminal(module_color="reverse", background="default", quiet_zone=1))
+            logger.info(self.rextag.terminal(module_color="reverse", background="default", quiet_zone=1))
 
         else:
-            print(self.rextag.terminal(quiet_zone=1))
+            logger.info(self.rextag.terminal(quiet_zone=1))
 
         return True
 

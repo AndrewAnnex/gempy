@@ -53,7 +53,6 @@ def _setdoc_pro(docstring=[]):
 
         if func.__doc__ is None:
             raise AttributeError('Add """"""" to the docstring')
-           # print(func.__doc__)
         else:
             # Loop for the docstrings we pass looking for numbers
             for e, i in enumerate(docstring):
@@ -77,16 +76,11 @@ def _setdoc_pro(docstring=[]):
         text = []
         marker = '[s_'
         for e in range(10):
-            #print(len(func.__doc__), func.__doc__)
-            #print('loc_1', loc_1)
-            #print(func.__doc__)
             loc_0 = func.__doc__[loc_1:].find(marker)
             if loc_0 == -1:
                 break
             else:
                 loc_0 +=  loc_1
-            #print('Here it is: ', func.__doc__[loc_1+len(text):loc_1+len(text)+50])
-            #print(loc_0)
 
             end_marker = func.__doc__[loc_0:].find(']')
             loc_1 = loc_0 + end_marker

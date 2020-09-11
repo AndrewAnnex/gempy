@@ -43,10 +43,7 @@ class Posterior():
         if entropy:
             print('All post models are calculated. Based on the model complexity and the number of iterations, '
                   'this could take a while')
-        # if topography:
         self.topography = topography
-        # else:
-        # print('no topography defined. Methods that contain the word _map_ are not available')
 
         self.interp_data = interpdata
 
@@ -86,14 +83,11 @@ class Posterior():
         self.interp_data.geo_data_res._orientations[["G_x", "G_y", "G_z", "X", "Y", "Z", "dip", "azimuth", "polarity"]] = \
             self.input_data[i][1]
         self.interp_data.update_interpolator()
-        # if self.verbose:
-        # print("interp_data parameters changed.")
         return self.interp_data
 
     def all_post_maps(self):
         all_maps = []
         for i in range(0, self.n_iter):
-            # print(i)
             self._change_input_data(i)
             # geomap = self.topography.calculate_geomap(interpdata = self.interp_data, plot=True)
             geomap, faultmap = gp.compute_model_at(self.topography.surface_coordinates[0], self.interp_data)
@@ -104,7 +98,6 @@ class Posterior():
         lbs = []
         fbs = []
         for i in range(0, self.n_iter):
-            # print(i)
             self._change_input_data(i)
             lith_block, fault_block = gp.compute_model(self.interp_data)
             if lith_block.shape[0] != 0:
@@ -112,7 +105,6 @@ class Posterior():
             if fault_block.shape[0] != 0:
                 n = 0
                 while n < fault_block.shape[0]:
-                    # print(fault_block.shape[0])
                     fbs.insert(i, fault_block[n])
                     n += 2
         return lbs, fbs
@@ -124,7 +116,6 @@ class Posterior():
         for i, l_id in enumerate(lith_id):
             count[i] = np.sum(blocks == l_id, axis=0)
         prob = count / len(blocks)
-        # print(lith_prob)
         return prob
 
     def calculate_ie_masked(self, prob):

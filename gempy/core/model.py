@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger('gempy')
 import os
 import shutil
 import sys
@@ -279,7 +281,7 @@ class ImplicitCoKriging(object):
             self._grid.deactivate_all_grids()
         self._grid.set_active(grid_name)
         self.update_from_grid()
-        print(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
+        logger.info(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
 
         return self._grid
 
@@ -328,7 +330,7 @@ class ImplicitCoKriging(object):
             self._grid.regular_grid.set_topography_mask(self._grid.topography)
 
         self.update_from_grid()
-        print(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
+        logger.info(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
         return self._grid
 
     @_setdoc_pro()
@@ -354,7 +356,7 @@ class ImplicitCoKriging(object):
             self._grid.update_grid_values()
 
         self.update_from_grid()
-        print(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
+        logger.info(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
         return self._grid
 
     @plot_set_topography
@@ -406,7 +408,7 @@ class ImplicitCoKriging(object):
                 pass
 
         self.update_from_grid()
-        print(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
+        logger.info(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
         return self._grid
 
     @_setdoc_pro(Grid.create_centered_grid.__doc__)
@@ -432,7 +434,7 @@ class ImplicitCoKriging(object):
             self._grid.update_grid_values()
         self.set_active_grid('centered')
         self.update_from_grid()
-        # print(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
+        # logger.info(f'Active grids: {self._grid.grid_types[self._grid.active_grids]}')
         return self._grid
 
     @_setdoc_pro(Grid.create_section_grid.__doc__)
@@ -698,7 +700,7 @@ class ImplicitCoKriging(object):
         self._interpolator.set_theano_shared_relations()
         self._interpolator.set_theano_shared_loop()
         if change_color:
-            print('Fault colors changed. If you do not like this behavior, set change_color to False.')
+            logger.info('Fault colors changed. If you do not like this behavior, set change_color to False.')
             self._surfaces.colors.make_faults_black(feature_fault)
         self.update_from_series(False, False, False)
         self.update_structure(update_theano='matrices')
@@ -1413,7 +1415,7 @@ class ImplicitCoKriging(object):
             self.update_structure(update_theano='matrices')
 
         if update_kriging is True:
-            print('Setting kriging parameters to their default values.')
+            logger.info('Setting kriging parameters to their default values.')
             self._additional_data.update_default_kriging()
 
         return self._additional_data
@@ -1577,7 +1579,7 @@ class Project(ImplicitCoKriging):
         path = f'{path}/{name}'
 
         if os.path.isdir(path):
-            print("Directory already exists, files will be overwritten")
+            logger.info("Directory already exists, files will be overwritten")
         else:
             os.mkdir(f'{path}')
 

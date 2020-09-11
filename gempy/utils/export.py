@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger('gempy')
 
 from matplotlib.cm import ScalarMappable as SM
 from gempy.plot._visualization_2d import PlotData2D
@@ -28,7 +30,7 @@ def export_geomap2geotiff(path, geo_model, geo_map=None, geotiff_filepath=None):
 
     if geotiff_filepath is None:
         # call the other function
-        print('stupid')
+        pass
 
     # **********************************************************************
     geo_map_rgb = SM(norm=norm, cmap=cmap).to_rgba(geo_map.T) # r,g,b,alpha
@@ -60,7 +62,7 @@ def export_geomap2geotiff(path, geo_model, geo_map=None, geotiff_filepath=None):
     band = None
     ds = None
 
-    print("Successfully exported geological map to  " +path)
+    logger.info("Successfully exported geological map to  " +path)
 
 def export_moose_input(geo_model, path=None, filename='geo_model_units_moose_input.i'):
     """
@@ -133,4 +135,4 @@ def export_moose_input(geo_model, path=None, filename='geo_model_units_moose_inp
     f.write(fstring)
     f.close()
     
-    print("Successfully exported geological model as moose input to "+path)
+    logger.info("Successfully exported geological model as moose input to "+path)

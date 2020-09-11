@@ -173,7 +173,6 @@ class VanMisesFisher:
             w = (1. - (1. + b) * z) / (1. - (1. - b) * z)
             u = np.random.uniform(low=0, high=1)
             if self.kappa * w + dim * np.log(1. - x * w) - c >= np.log(u):
-                # print(w)
                 return w
 
     def _sample_orthonormal_to(self):

@@ -667,10 +667,8 @@ class Plot2D:
                     self.model.solutions.scalar_field_at_surface_points[e] != 0)]
                 # c_id = e
                 c_id2 = c_id + len(level)
-                #    print(c_id, c_id2)
 
                 color_list = self.model._surfaces.df.groupby('isActive').get_group(True)['color'][c_id:c_id2][::-1]
-                #    print(color_list)
 
                 ax.contour(block.reshape(shape)[_slice].T, 0, levels=np.sort(level),
                            colors=color_list,

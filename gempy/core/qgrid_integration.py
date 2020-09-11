@@ -83,7 +83,6 @@ class QgridModelIntegration(object):
                          self.qgrid_or, self.qgrid_op, self.qgrid_kr, self.qgrid_re]
 
         for e, qgrid_object in enumerate(qgrid_objects):
-           # print('qgrid_object' + str(e) )
             if e == 1:
                 qgrid_object.df = self._geo_model._stack.df.reset_index().rename(columns={'index': 'series_names'}).astype(
                     {'series_names': str})

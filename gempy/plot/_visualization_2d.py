@@ -190,7 +190,6 @@ class PlotData2D:
                                  "s": 100,
                                  "edgecolors": "black",
                                  "linewidths": 1}
-        # print(plot_surfpoints)
         self._plot_surface_points(x, y, plot_surfpoints, aspect, extent, kwargs)
         Gx = 'G_x'
         Gy = 'G_z'
@@ -200,9 +199,6 @@ class PlotData2D:
 
     def _plot_surface_points(self, x, y, series_to_plot_i, aspect, extent, kwargs):
         if series_to_plot_i.shape[0] != 0:
-            # size = fig.get_size_inches() * fig.dpi
-            # print(size)
-            # print(aspect)
             try:
                 p = sns.FacetGrid(series_to_plot_i, hue="surface",
                                   palette=self._color_lot,
